@@ -2,14 +2,26 @@ version: '3.9'
 
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
       - 13306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: 12345678 
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password 
     volumes:
       - db_data:/var/lib/mysql
+    secrets:
+      - db_root_password
 
 volumes:
   db_data:
+
+secrets:
+  db_root_password:
+    file: ./db_root_password.txt
+
